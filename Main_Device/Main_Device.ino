@@ -9,7 +9,7 @@
 #include <HardwareSerial.h>
 
 // --- FIRMWARE VERSION ---
-const String FW_VERSION = "1.0.0";
+const String FW_VERSION = "1.1.2";
 
 // --- HARDWARE SETTINGS ---
 Adafruit_MPU6050 mpu1;
@@ -200,12 +200,19 @@ void loop() {
   if (central) {
     Serial.print("Connected to: ");
     Serial.println(central.address());
-    dataChar.writeValue("FW:" + FW_VERSION);
-    delay(50);
+
+    bool fwSent = false;
 
     while (central.connected()) {
       if (otaRequested) {
         break;
+      }
+
+      if (!fwSent && dataChar.subscribed()) {
+        delay(100); // Brief buffer after subscription
+        dataChar.writeValue("FW:" + FW_VERSION);
+        fwSent = true;
+        Serial.println("Firmware version sent.");
       }
 
       if (dataChar.written()) {
