@@ -4,13 +4,14 @@
 #include <Wire.h>
 #include <esp_now.h>
 #include <WiFi.h>
+#include "HardwareSerial.h"
 
 // --- HARDWARE SETTINGS ---
 Adafruit_MPU6050 mpu1; // Gyro 1
 Adafruit_MPU6050 mpu2; // Gyro 2
 
 const int batteryPin = A0;
-const int servoPin = D9; 
+const int servoPin = 9;
 
 // --- NATIVE PWM ---
 const int servoChannel = 4; 
@@ -48,7 +49,8 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingDataPtr, int len) {
 
 void moveServo(int angle) {
   int duty = map(angle, 0, 270, 102, 512);
-  ledcWrite(servoChannel, duty);
+  analogWrite(servoPin, duty);
+  // ledcWriteChannel(servoChannel, duty );
 }
 
 void setup() {
@@ -66,7 +68,7 @@ void setup() {
     Serial.println("ESP-NOW Receiver Active.");
   }
 
-  2. INITIALIZE GYROS.                                     
+  // 2. INITIALIZE GYROS.                                     
   if (!mpu1.begin(0x68)) {
     Serial.println("G1 (0x68) FAILED! Check wiring.");
   } else { Serial.println("G1 Ready."); }
